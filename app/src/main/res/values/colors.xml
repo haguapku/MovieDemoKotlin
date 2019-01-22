@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Status bar color-->
+    <color name="statusColor">#272727</color>
+    <!-- toolBar color -->
+    <color name="toolBarColor">#272727</color>
+    <!--Window color-->
+    <color name="widowColor">#000000</color>
+    <!--Rating Star color-->
+    <color name="starColor">#FF8C00</color>
+</resources>

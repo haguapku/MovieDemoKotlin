@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">KotlinMovieDemo</string>
+    <string name="movie_category">Most Popular Movies</string>
+    <string name="search">Search</string>
+    <string name="pull_up_to_load_more">Pull up to load more</string>
+    <string name="no_more_data">No more data</string>
+    <string name="loading">Loading …</string>
+    <string name="movie_poster">Movie Poster</string>
+</resources>
