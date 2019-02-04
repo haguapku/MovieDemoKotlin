@@ -1,0 +1,19 @@
+package com.example.moviedemokotlin.di
+
+import com.example.moviedemokotlin.MainActivity
+import com.example.moviedemokotlin.ui.MainFragment
+import dagger.Module
+import dagger.android.ContributesAndroidInjector
+
+/**
+ * Author: created by MarkYoung on 4/02/2019 13:23
+ */
+@Module
+abstract class BuildersModule{
+
+    @ContributesAndroidInjector
+    abstract fun contributeMainActivity(): MainActivity
+
+    @ContributesAndroidInjector
+    abstract fun contributeMainFragment(): MainFragment
+}

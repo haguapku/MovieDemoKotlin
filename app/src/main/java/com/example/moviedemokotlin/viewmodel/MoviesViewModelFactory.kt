@@ -4,11 +4,14 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import com.example.moviedemokotlin.api.MovieService
 import com.example.moviedemokotlin.data.MoviesRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Author: created by MarkYoung on 22/01/2019 11:24
  */
-class MoviesViewModelFactory(val moviesRepository: MoviesRepository): ViewModelProvider.Factory {
+class MoviesViewModelFactory @Inject constructor(val moviesRepository: MoviesRepository)
+    : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {

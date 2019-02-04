@@ -2,6 +2,7 @@ package com.example.moviedemokotlin.ui
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
@@ -12,17 +13,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.example.moviedemokotlin.R
-import com.example.moviedemokotlin.data.MoviesRepository
 import com.example.moviedemokotlin.data.model.ApiResponse
 import com.example.moviedemokotlin.viewmodel.MoviesViewModel
 import com.example.moviedemokotlin.viewmodel.MoviesViewModelFactory
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
 /**
  * Author: created by MarkYoung on 22/01/2019 14:51
  */
 class MainFragment : Fragment() {
 
-    private val factory = MoviesViewModelFactory(MoviesRepository())
+    @Inject lateinit var factory: MoviesViewModelFactory
 
     private lateinit var moviesViewModel: MoviesViewModel
 
@@ -46,6 +48,11 @@ class MainFragment : Fragment() {
         val TAG = "mainfragment"
 
         fun create(): MainFragment = MainFragment()
+    }
+
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

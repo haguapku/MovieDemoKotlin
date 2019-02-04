@@ -18,7 +18,7 @@ interface MovieService {
     fun getMovies(@Query("page") page: String): Single<MovieLoadResponse>
 
     companion object {
-        fun getMovieService(): MovieService = Retrofit.Builder()
+        fun create(): MovieService = Retrofit.Builder()
                 .baseUrl("https://api.themoviedb.org")
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
