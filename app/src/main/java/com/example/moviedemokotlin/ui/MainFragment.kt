@@ -47,7 +47,7 @@ class MainFragment : Fragment() {
         @JvmField
         val TAG = "mainfragment"
 
-        fun create(): MainFragment = MainFragment()
+        fun create() = MainFragment()
     }
 
     override fun onAttach(context: Context?) {
