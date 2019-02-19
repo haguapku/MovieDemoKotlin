@@ -20,15 +20,17 @@ import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 /**
- * Author: created by MarkYoung on 22/01/2019 14:51
+ * Author: created by MarkYoung on 19/02/2019 16:17
  */
-class MainFragment : Fragment() {
+class SearchFragment: Fragment() {
 
-    @Inject lateinit var factory: MoviesViewModelFactory
+    @Inject
+    lateinit var factory: MoviesViewModelFactory
 
     private lateinit var moviesViewModel: MoviesViewModel
 
-    private lateinit var moviesAdapter: MoviesAdapter
+    @Inject
+    lateinit var moviesAdapter: MoviesAdapter
 
     private lateinit var recyclerView: RecyclerView
 
@@ -38,6 +40,8 @@ class MainFragment : Fragment() {
     private var page = 1
     private var total_pages = 0
 
+    private lateinit var query: String
+
     private var isLoading = false
     private var isPullUp = false
     private var isRefreshing = false
@@ -45,9 +49,9 @@ class MainFragment : Fragment() {
     companion object {
 
         @JvmField
-        val TAG = "mainfragment"
+        val TAG = "searchmoviesfragment"
 
-        fun create() = MainFragment()
+        fun create() = SearchFragment()
     }
 
     override fun onAttach(context: Context?) {
@@ -55,9 +59,13 @@ class MainFragment : Fragment() {
         super.onAttach(context)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        query = arguments!!.get("QueryKey") as String
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        moviesAdapter = MoviesAdapter(ArrayList())
         val view: View = inflater.inflate(R.layout.fragment_main, container, false)
         recyclerView = view.findViewById(R.id.movie_list)
         val manager = GridLayoutManager(context,2)
@@ -68,9 +76,9 @@ class MainFragment : Fragment() {
         swipeRefreshLayout.setOnRefreshListener {
             moviesAdapter.resetData()
             page = 1
-            moviesViewModel.loadMovies(page.toString())
+            moviesViewModel.searchMovies(query, page.toString())
         }
-        recyclerView.addOnScrollListener(object :RecyclerView.OnScrollListener(){
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 lastVisibleItem = manager.findLastVisibleItemPosition()
@@ -89,7 +97,7 @@ class MainFragment : Fragment() {
                         if (page < total_pages){
                             isLoading = true
                             page++
-                            moviesViewModel.loadMovies(page.toString())
+                            moviesViewModel.searchMovies(query, page.toString())
                             moviesAdapter.changeLoadState(MoviesAdapter.LOADING_MORE)
                         }else
                             moviesAdapter.changeLoadState(MoviesAdapter.NO_MORE)
@@ -102,8 +110,9 @@ class MainFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        moviesAdapter.resetData()
         moviesViewModel = ViewModelProviders.of(this,factory).get(MoviesViewModel::class.java)
-        moviesViewModel.getMoviesLivedata().observe(this
+        moviesViewModel.getSearchMoviesLivedata().observe(viewLifecycleOwner
                 , Observer<ApiResponse> { t ->
             run{
                 if(t?.movieLoadResponse != null) {
@@ -113,7 +122,6 @@ class MainFragment : Fragment() {
                     moviesAdapter.addMovies(t.movieLoadResponse.results)
                     moviesAdapter.changeLoadState(MoviesAdapter.PULL_UP_TO_LOAD)
                     isLoading = false
-
                 }
                 else if(t?.errorMessage != null){
                     swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = false }
@@ -123,6 +131,7 @@ class MainFragment : Fragment() {
                 }
             }
         })
-        moviesViewModel.loadMovies("1")
+        moviesAdapter.resetData()
+        moviesViewModel.searchMovies(query,"1")
     }
 }

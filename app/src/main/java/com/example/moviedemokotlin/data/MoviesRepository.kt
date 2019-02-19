@@ -11,6 +11,12 @@ import javax.inject.Singleton
  */
 class MoviesRepository @Inject constructor(val movieService: MovieService) {
 
-//    fun loadFromServer(page: String): Single<MovieLoadResponse> = MovieService.getMovieService().getMovies(page)
-    fun loadFromServer(page: String): Single<MovieLoadResponse> = movieService.getMovies(page)
+//    fun loadPopularMoviesFromServer(page: String): Single<MovieLoadResponse> = MovieService.getMovieService().getMovies(page)
+    fun loadPopularMoviesFromServer(page: String): Single<MovieLoadResponse> = movieService.getPopularMovies(page)
+
+    fun loadTopRatedMoviesFromServer(page: String): Single<MovieLoadResponse> = movieService.getTopRatedMovies(page)
+
+    fun loadNowPlayingMoviesFromServer(page: String): Single<MovieLoadResponse> = movieService.getNowPlayingMovies(page)
+
+    fun searchMoviesFromServer(query: String, page: String): Single<MovieLoadResponse> = movieService.searchMovies(query, page)
 }

@@ -12,7 +12,7 @@ import com.example.moviedemokotlin.data.model.Movie
 /**
  * Author: created by MarkYoung on 22/01/2019 11:44
  */
-class MoviesAdapter(private var movies: MutableList<Movie>): RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+class MoviesAdapter(var movies: MutableList<Movie>): RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
     private val TYPE_ITEM = 1
     private val TYPE_FOOT = 2

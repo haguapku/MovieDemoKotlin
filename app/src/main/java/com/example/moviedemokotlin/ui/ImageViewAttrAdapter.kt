@@ -16,7 +16,7 @@ class ImageViewAttrAdapter {
     companion object {
         @JvmStatic
         @BindingAdapter("imageUrl","placeHolder","errorImage")
-        fun loadImage(imageView: ImageView, url: String, holdDrawable: Drawable, errorDrawable: Drawable){
+        fun loadImage(imageView: ImageView, url: String?, holdDrawable: Drawable, errorDrawable: Drawable){
 
             Glide.with(imageView.context)
                     .load("https://image.tmdb.org/t/p/w200" + url)

@@ -20,7 +20,16 @@ import java.util.concurrent.TimeUnit
 interface MovieService {
 
     @GET("/3/movie/popular?api_key=" + BuildConfig.API_KEY)
-    fun getMovies(@Query("page") page: String): Single<MovieLoadResponse>
+    fun getPopularMovies(@Query("page") page: String): Single<MovieLoadResponse>
+
+    @GET("/3/movie/top_rated?api_key=" + BuildConfig.API_KEY)
+    fun getTopRatedMovies(@Query("page") page: String): Single<MovieLoadResponse>
+
+    @GET("/3/movie/now_playing?api_key=" + BuildConfig.API_KEY)
+    fun getNowPlayingMovies(@Query("page") page: String): Single<MovieLoadResponse>
+
+    @GET("/3/search/movie?api_key=" + BuildConfig.API_KEY)
+    fun searchMovies(@Query("query") query: String, @Query("page") page: String): Single<MovieLoadResponse>
 
     companion object {
         fun create(): MovieService = Retrofit.Builder()

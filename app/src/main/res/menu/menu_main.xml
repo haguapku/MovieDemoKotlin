@@ -6,7 +6,25 @@
 
     <item
         android:id="@+id/action_search"
-        android:icon="@android:drawable/ic_menu_search"
         android:title="@string/search"
-        app:showAsAction="ifRoom"/>
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/most_popular"
+        android:title="@string/mostPopularMovies"
+        app:showAsAction="collapseActionView"
+        />
+
+    <item
+        android:id="@+id/top_rated"
+        android:title="@string/topRated"
+        app:showAsAction="collapseActionView"
+        />
+
+    <item
+        android:id="@+id/now_playing"
+        android:title="@string/nowPlaying"
+        app:showAsAction="collapseActionView"
+        />
 </menu>

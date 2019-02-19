@@ -16,29 +16,93 @@ import io.reactivex.schedulers.Schedulers
  */
 class MoviesViewModel(val moviesRepository: MoviesRepository): ViewModel(){
 
-    var moviesLiveData: MutableLiveData<ApiResponse> = MutableLiveData();
+    var popularMoviesLiveData: MutableLiveData<ApiResponse> = MutableLiveData()
+
+    var topRatedMoviesLiveData: MutableLiveData<ApiResponse> = MutableLiveData()
+
+    var nowPlayingMoviesLiveData: MutableLiveData<ApiResponse> = MutableLiveData()
+
+    var searchMoviesLiveData: MutableLiveData<ApiResponse> = MutableLiveData()
 
     val disposables: CompositeDisposable = CompositeDisposable()
 
-    fun loadMovies(page: String){
+    /*init {
+        System.out.println("------hagua--------")
+        loadPopularMovies("1")
+        loadTopRatedMovies("1")
+        loadNowPlayingMovies("1")
+    }*/
 
-        disposables.add(moviesRepository.loadFromServer(page)
+    fun loadPopularMovies(page: String){
+
+        disposables.add(moviesRepository.loadPopularMoviesFromServer(page)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : DisposableSingleObserver<MovieLoadResponse>(){
                     override fun onSuccess(t: MovieLoadResponse) {
-                        println("-----LoadMoviesSuccess------"+t.total_pages)
-                        moviesLiveData.value = ApiResponse(t,null)
+                        popularMoviesLiveData.value = ApiResponse(t,null)
                     }
                     override fun onError(e: Throwable) {
-                        println("----fail-----")
-                        moviesLiveData.value = ApiResponse(null,e.message)
+                        popularMoviesLiveData.value = ApiResponse(null,e.message)
+                    }
+                }))
+    }
+
+    fun loadTopRatedMovies(page: String){
+
+        disposables.add(moviesRepository.loadTopRatedMoviesFromServer(page)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : DisposableSingleObserver<MovieLoadResponse>(){
+                    override fun onSuccess(t: MovieLoadResponse) {
+                        topRatedMoviesLiveData.value = ApiResponse(t,null)
+                    }
+                    override fun onError(e: Throwable) {
+                        topRatedMoviesLiveData.value = ApiResponse(null,e.message)
                     }
 
                 }))
     }
 
-    fun getMoviesLivedata(): LiveData<ApiResponse> = moviesLiveData
+    fun loadNowPlayingMovies(page: String){
+
+        disposables.add(moviesRepository.loadNowPlayingMoviesFromServer(page)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : DisposableSingleObserver<MovieLoadResponse>(){
+                    override fun onSuccess(t: MovieLoadResponse) {
+                        nowPlayingMoviesLiveData.value = ApiResponse(t,null)
+                    }
+                    override fun onError(e: Throwable) {
+                        nowPlayingMoviesLiveData.value = ApiResponse(null,e.message)
+                    }
+
+                }))
+    }
+
+    fun searchMovies(query: String, page: String){
+
+        disposables.add(moviesRepository.searchMoviesFromServer(query, page)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : DisposableSingleObserver<MovieLoadResponse>(){
+                    override fun onSuccess(t: MovieLoadResponse) {
+                        searchMoviesLiveData.value = ApiResponse(t,null)
+                    }
+                    override fun onError(e: Throwable) {
+                        searchMoviesLiveData.value = ApiResponse(null,e.message)
+                    }
+
+                }))
+    }
+
+    fun getPopularMoviesLivedata(): LiveData<ApiResponse> = popularMoviesLiveData
+
+    fun getTopRatedMoviesLivedata(): LiveData<ApiResponse> = topRatedMoviesLiveData
+
+    fun getNowPlayingMoviesLivedata(): LiveData<ApiResponse> = nowPlayingMoviesLiveData
+
+    fun getSearchMoviesLivedata(): LiveData<ApiResponse> = searchMoviesLiveData
 
     override fun onCleared() {
         super.onCleared()
