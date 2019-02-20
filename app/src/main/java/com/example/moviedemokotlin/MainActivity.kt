@@ -13,6 +13,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import com.example.moviedemokotlin.di.Injectable
 import com.example.moviedemokotlin.ui.PopularMoviesFragment
 import com.example.moviedemokotlin.ui.NowPlayingMoviesFragment
 import com.example.moviedemokotlin.ui.SearchFragment
@@ -25,14 +26,14 @@ import dagger.android.support.HasSupportFragmentInjector
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
+class MainActivity : AppCompatActivity(), HasSupportFragmentInjector, Injectable {
 
     @Inject lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
 
     private lateinit var searchView: SearchView
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
+//        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -54,6 +55,8 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
             supportFragmentManager.findFragmentByTag(NowPlayingMoviesFragment.TAG) != null -> {
                 movie_category.text = this.getString(R.string.nowPlayingMovies)
             }
+            supportFragmentManager.findFragmentByTag(SearchFragment.TAG) != null -> {
+            }
             else -> supportFragmentManager.beginTransaction()
                     .replace(R.id.container, PopularMoviesFragment.create(), PopularMoviesFragment.TAG)
                     .commitNow()
@@ -68,16 +71,15 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
         searchView.setOnQueryTextListener(object :SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
-//                Toast.makeText(this@MainActivity,p0,Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this@MainActivity,query,Toast.LENGTH_SHORT).show()
+                movie_category.text = query
                 val bundle = Bundle()
                 bundle.putString("QueryKey", query)
                 val searchFragment = SearchFragment.create()
                 searchFragment.arguments = bundle
-                if (supportFragmentManager.findFragmentByTag(SearchFragment.TAG) == null) {
-                    supportFragmentManager.beginTransaction()
-                            .replace(R.id.container, searchFragment,SearchFragment.TAG)
-                            .commit()
-                }
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.container, searchFragment,SearchFragment.TAG)
+                        .commit()
                 return false
             }
 

@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.moviedemokotlin.R
+import com.example.moviedemokotlin.api.OnItemClick
 import com.example.moviedemokotlin.data.model.Movie
 
 /**
@@ -16,6 +17,8 @@ class MoviesAdapter(var movies: MutableList<Movie>): RecyclerView.Adapter<Recycl
 
     private val TYPE_ITEM = 1
     private val TYPE_FOOT = 2
+
+    private lateinit var onItemClick: OnItemClick
 
     companion object {
         @JvmField
@@ -35,11 +38,18 @@ class MoviesAdapter(var movies: MutableList<Movie>): RecyclerView.Adapter<Recycl
             notifyItemRangeChanged(movies.size - newMovies.size, movies.size)
     }
 
+    fun setMoviesList(newMovies: List<Movie>){
+        movies.clear()
+        movies.addAll(newMovies)
+        notifyItemRangeChanged(0, movies.size)
+    }
+
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
 
         return when(viewType){
             TYPE_ITEM -> MovieViewHolder(DataBindingUtil
-                    .inflate(LayoutInflater.from(viewGroup.context), R.layout.movie_item,viewGroup,false))
+                    .inflate(LayoutInflater.from(viewGroup.context), R.layout.movie_item,viewGroup,false)
+            , onItemClick)
             else -> FootViewHolder(LayoutInflater
                     .from(viewGroup.context).inflate(R.layout.foot_item,viewGroup,false))
         }
@@ -81,6 +91,7 @@ class MoviesAdapter(var movies: MutableList<Movie>): RecyclerView.Adapter<Recycl
                         viewHolder.tvState.setText(R.string.no_more_data)
                     }
                 }
+
             }
         }
     }
@@ -99,14 +110,18 @@ class MoviesAdapter(var movies: MutableList<Movie>): RecyclerView.Adapter<Recycl
 
     override fun getItemViewType(position: Int): Int {
 
-        return when(position){
-            itemCount-1 -> TYPE_FOOT
-            else -> TYPE_ITEM
-        }
+        return when (position) {
+                itemCount - 1 -> TYPE_FOOT
+                else -> TYPE_ITEM
+            }
     }
 
     fun changeLoadState(loadState: Int) {
         this.loadState = loadState
         notifyItemRangeChanged(movies.size, 1)
+    }
+
+    fun setOnItemClick(onItemClick: OnItemClick) {
+        this.onItemClick = onItemClick
     }
 }

@@ -2,7 +2,6 @@ package com.example.moviedemokotlin.ui
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
@@ -14,15 +13,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.example.moviedemokotlin.R
 import com.example.moviedemokotlin.data.model.ApiResponse
+import com.example.moviedemokotlin.di.Injectable
 import com.example.moviedemokotlin.viewmodel.MoviesViewModel
 import com.example.moviedemokotlin.viewmodel.MoviesViewModelFactory
-import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 /**
  * Author: created by MarkYoung on 19/02/2019 16:17
  */
-class SearchFragment: Fragment() {
+class SearchFragment: Fragment(), Injectable {
 
     @Inject
     lateinit var factory: MoviesViewModelFactory
@@ -54,11 +53,6 @@ class SearchFragment: Fragment() {
         fun create() = SearchFragment()
     }
 
-    override fun onAttach(context: Context?) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         query = arguments!!.get("QueryKey") as String
@@ -75,6 +69,7 @@ class SearchFragment: Fragment() {
         swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = true }
         swipeRefreshLayout.setOnRefreshListener {
             moviesAdapter.resetData()
+            moviesViewModel.resetSearchMovies()
             page = 1
             moviesViewModel.searchMovies(query, page.toString())
         }
@@ -110,16 +105,16 @@ class SearchFragment: Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        moviesAdapter.resetData()
         moviesViewModel = ViewModelProviders.of(this,factory).get(MoviesViewModel::class.java)
         moviesViewModel.getSearchMoviesLivedata().observe(viewLifecycleOwner
                 , Observer<ApiResponse> { t ->
             run{
-                if(t?.movieLoadResponse != null) {
+                if(t?.moviesResponse != null) {
                     swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = false }
-                    page = t.movieLoadResponse.page
-                    total_pages = t.movieLoadResponse.total_pages
-                    moviesAdapter.addMovies(t.movieLoadResponse.results)
+                    page = t.moviesResponse.page
+                    total_pages = t.moviesResponse.total_pages
+                    moviesAdapter.setMoviesList(t.moviesResponse.results)
+//                    moviesAdapter.addMovies(t.moviesResponse.results)
                     moviesAdapter.changeLoadState(MoviesAdapter.PULL_UP_TO_LOAD)
                     isLoading = false
                 }
@@ -131,6 +126,7 @@ class SearchFragment: Fragment() {
                 }
             }
         })
+        moviesViewModel.resetSearchMovies()
         moviesAdapter.resetData()
         moviesViewModel.searchMovies(query,"1")
     }

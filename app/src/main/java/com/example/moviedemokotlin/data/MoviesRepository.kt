@@ -9,6 +9,7 @@ import javax.inject.Singleton
 /**
  * Author: created by MarkYoung on 22/01/2019 15:19
  */
+@Singleton
 class MoviesRepository @Inject constructor(val movieService: MovieService) {
 
 //    fun loadPopularMoviesFromServer(page: String): Single<MovieLoadResponse> = MovieService.getMovieService().getMovies(page)

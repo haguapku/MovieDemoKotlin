@@ -2,7 +2,9 @@ package com.example.moviedemokotlin
 
 import android.app.Activity
 import android.app.Application
+import com.example.moviedemokotlin.di.AppInjector
 import com.example.moviedemokotlin.di.DaggerAppComponent
+import com.example.moviedemokotlin.di.Injectable
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import javax.inject.Inject
@@ -17,7 +19,8 @@ class MovieApplication: Application(), HasActivityInjector{
     override fun onCreate() {
         super.onCreate()
         instance = this
-        DaggerAppComponent.builder().application(this).build().inject(this)
+//        DaggerAppComponent.builder().application(this).build().inject(this)
+        AppInjector.init(this)
     }
 
     companion object {

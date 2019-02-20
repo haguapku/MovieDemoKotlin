@@ -2,7 +2,6 @@ package com.example.moviedemokotlin.ui
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
@@ -14,15 +13,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.example.moviedemokotlin.R
 import com.example.moviedemokotlin.data.model.ApiResponse
+import com.example.moviedemokotlin.di.Injectable
 import com.example.moviedemokotlin.viewmodel.MoviesViewModel
 import com.example.moviedemokotlin.viewmodel.MoviesViewModelFactory
-import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 /**
  * Author: created by MarkYoung on 19/02/2019 14:31
  */
-class NowPlayingMoviesFragment: Fragment(){
+class NowPlayingMoviesFragment: Fragment(), Injectable{
 
     @Inject
     lateinit var factory: MoviesViewModelFactory
@@ -52,11 +51,6 @@ class NowPlayingMoviesFragment: Fragment(){
         fun create() = NowPlayingMoviesFragment()
     }
 
-    override fun onAttach(context: Context?) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val view: View = inflater.inflate(R.layout.fragment_main, container, false)
@@ -68,6 +62,7 @@ class NowPlayingMoviesFragment: Fragment(){
         swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = true }
         swipeRefreshLayout.setOnRefreshListener {
             moviesAdapter.resetData()
+            moviesViewModel.resetNowPlayingMovies()
             page = 1
             moviesViewModel.loadNowPlayingMovies(page.toString())
         }
@@ -103,16 +98,16 @@ class NowPlayingMoviesFragment: Fragment(){
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-//        moviesAdapter.resetData()
         moviesViewModel = ViewModelProviders.of(this,factory).get(MoviesViewModel::class.java)
         moviesViewModel.getNowPlayingMoviesLivedata().observe(viewLifecycleOwner
                 , Observer<ApiResponse> { t ->
             run{
-                if(t?.movieLoadResponse != null) {
+                if(t?.moviesResponse != null) {
                     swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = false }
-                    page = t.movieLoadResponse.page
-                    total_pages = t.movieLoadResponse.total_pages
-                    moviesAdapter.addMovies(t.movieLoadResponse.results)
+                    page = t.moviesResponse.page
+                    total_pages = t.moviesResponse.total_pages
+                    moviesAdapter.setMoviesList(t.moviesResponse.results)
+//                    moviesAdapter.addMovies(t.moviesResponse.results)
                     moviesAdapter.changeLoadState(MoviesAdapter.PULL_UP_TO_LOAD)
                     isLoading = false
                 }
@@ -124,7 +119,5 @@ class NowPlayingMoviesFragment: Fragment(){
                 }
             }
         })
-        moviesAdapter.resetData()
-        moviesViewModel.loadNowPlayingMovies("1")
     }
 }

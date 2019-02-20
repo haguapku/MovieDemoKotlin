@@ -2,7 +2,6 @@ package com.example.moviedemokotlin.ui
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
@@ -13,16 +12,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.example.moviedemokotlin.R
+import com.example.moviedemokotlin.api.OnItemClick
 import com.example.moviedemokotlin.data.model.ApiResponse
+import com.example.moviedemokotlin.data.model.Movie
+import com.example.moviedemokotlin.di.Injectable
 import com.example.moviedemokotlin.viewmodel.MoviesViewModel
 import com.example.moviedemokotlin.viewmodel.MoviesViewModelFactory
-import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 /**
  * Author: created by MarkYoung on 22/01/2019 14:51
  */
-class PopularMoviesFragment : Fragment() {
+class PopularMoviesFragment : Fragment(), OnItemClick, Injectable {
 
     @Inject lateinit var factory: MoviesViewModelFactory
 
@@ -42,17 +43,14 @@ class PopularMoviesFragment : Fragment() {
     private var isPullUp = false
     private var isRefreshing = false
 
+    private lateinit var movies: List<Movie>
+
     companion object {
 
         @JvmField
         val TAG = "mainfragment"
 
         fun create() = PopularMoviesFragment()
-    }
-
-    override fun onAttach(context: Context?) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -62,10 +60,12 @@ class PopularMoviesFragment : Fragment() {
         val manager = GridLayoutManager(context,2)
         recyclerView.layoutManager = manager
         recyclerView.adapter = moviesAdapter
+        moviesAdapter.setOnItemClick(this)
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
         swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = true }
         swipeRefreshLayout.setOnRefreshListener {
             moviesAdapter.resetData()
+            moviesViewModel.resetCachedPopularMovies()
             page = 1
             moviesViewModel.loadPopularMovies(page.toString())
         }
@@ -101,16 +101,17 @@ class PopularMoviesFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-//        moviesAdapter.resetData()
         moviesViewModel = ViewModelProviders.of(this,factory).get(MoviesViewModel::class.java)
         moviesViewModel.getPopularMoviesLivedata().observe(viewLifecycleOwner
                 , Observer<ApiResponse> { t ->
             run{
-                if(t?.movieLoadResponse != null) {
+                if(t?.moviesResponse != null) {
                     swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = false }
-                    page = t.movieLoadResponse.page
-                    total_pages = t.movieLoadResponse.total_pages
-                    moviesAdapter.addMovies(t.movieLoadResponse.results)
+                    movies = t.moviesResponse.results
+                    page = t.moviesResponse.page
+                    total_pages = t.moviesResponse.total_pages
+                    moviesAdapter.setMoviesList(t.moviesResponse.results)
+//                    moviesAdapter.addMovies(t.moviesResponse.results)
                     moviesAdapter.changeLoadState(MoviesAdapter.PULL_UP_TO_LOAD)
                     isLoading = false
                 }
@@ -122,7 +123,19 @@ class PopularMoviesFragment : Fragment() {
                 }
             }
         })
-        moviesAdapter.resetData()
-        moviesViewModel.loadPopularMovies("1")
     }
+
+    override fun onItemClick(view: View, position: Int) {
+
+        val bundle = Bundle()
+        bundle.putInt("position",position)
+        bundle.putInt("id", movies[position].id)
+        val movieDetailFragment = MovieDetailFragment.create()
+        movieDetailFragment.arguments = bundle
+        activity!!.supportFragmentManager!!.beginTransaction()
+                .replace(R.id.container, movieDetailFragment, MovieDetailFragment.TAG)
+                .addToBackStack(null)
+                .commit()
+    }
+
 }
