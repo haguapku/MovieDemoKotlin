@@ -12,7 +12,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.example.moviedemokotlin.R
+import com.example.moviedemokotlin.api.OnItemClick
 import com.example.moviedemokotlin.data.model.ApiResponse
+import com.example.moviedemokotlin.data.model.Movie
 import com.example.moviedemokotlin.di.Injectable
 import com.example.moviedemokotlin.viewmodel.MoviesViewModel
 import com.example.moviedemokotlin.viewmodel.MoviesViewModelFactory
@@ -21,7 +23,7 @@ import javax.inject.Inject
 /**
  * Author: created by MarkYoung on 19/02/2019 16:17
  */
-class SearchFragment: Fragment(), Injectable {
+class SearchFragment: Fragment(), OnItemClick, Injectable {
 
     @Inject
     lateinit var factory: MoviesViewModelFactory
@@ -45,6 +47,8 @@ class SearchFragment: Fragment(), Injectable {
     private var isPullUp = false
     private var isRefreshing = false
 
+    private lateinit var movies: List<Movie>
+
     companion object {
 
         @JvmField
@@ -65,6 +69,7 @@ class SearchFragment: Fragment(), Injectable {
         val manager = GridLayoutManager(context,2)
         recyclerView.layoutManager = manager
         recyclerView.adapter = moviesAdapter
+        moviesAdapter.setOnItemClick(this)
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
         swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = true }
         swipeRefreshLayout.setOnRefreshListener {
@@ -111,6 +116,7 @@ class SearchFragment: Fragment(), Injectable {
             run{
                 if(t?.moviesResponse != null) {
                     swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = false }
+                    movies = t.moviesResponse.results
                     page = t.moviesResponse.page
                     total_pages = t.moviesResponse.total_pages
                     moviesAdapter.setMoviesList(t.moviesResponse.results)
@@ -129,5 +135,17 @@ class SearchFragment: Fragment(), Injectable {
         moviesViewModel.resetSearchMovies()
         moviesAdapter.resetData()
         moviesViewModel.searchMovies(query,"1")
+    }
+
+    override fun onItemClick(view: View, position: Int) {
+        val bundle = Bundle()
+        bundle.putInt("position",position)
+        bundle.putInt("id", movies[position].id)
+        val movieDetailFragment = MovieDetailFragment.create()
+        movieDetailFragment.arguments = bundle
+        activity!!.supportFragmentManager!!.beginTransaction()
+                .replace(R.id.container, movieDetailFragment, MovieDetailFragment.TAG)
+                .addToBackStack(null)
+                .commit()
     }
 }

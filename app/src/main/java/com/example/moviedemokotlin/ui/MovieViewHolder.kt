@@ -17,7 +17,7 @@ class MovieViewHolder(val movieItemBinding: MovieItemBinding, private val onItem
 
     override fun onClick(view: View?) {
         if (view != null) {
-            onItemClick.onItemClick(view, adapterPosition%20)
+            onItemClick.onItemClick(view, adapterPosition)
         }
     }
 

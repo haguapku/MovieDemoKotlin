@@ -1,10 +1,7 @@
 package com.example.moviedemokotlin.di
 
 import com.example.moviedemokotlin.MainActivity
-import com.example.moviedemokotlin.ui.PopularMoviesFragment
-import com.example.moviedemokotlin.ui.NowPlayingMoviesFragment
-import com.example.moviedemokotlin.ui.SearchFragment
-import com.example.moviedemokotlin.ui.TopRatedMoviesFragment
+import com.example.moviedemokotlin.ui.*
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -28,4 +25,7 @@ abstract class BuildersModule{
 
     @ContributesAndroidInjector
     abstract fun contributeSearchMoviesFragment(): SearchFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeMovieDetailFragment(): MovieDetailFragment
 }

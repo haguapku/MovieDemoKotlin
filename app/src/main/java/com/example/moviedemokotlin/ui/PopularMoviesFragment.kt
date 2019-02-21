@@ -16,6 +16,7 @@ import com.example.moviedemokotlin.api.OnItemClick
 import com.example.moviedemokotlin.data.model.ApiResponse
 import com.example.moviedemokotlin.data.model.Movie
 import com.example.moviedemokotlin.di.Injectable
+import com.example.moviedemokotlin.viewmodel.MovieDetailViewModel
 import com.example.moviedemokotlin.viewmodel.MoviesViewModel
 import com.example.moviedemokotlin.viewmodel.MoviesViewModelFactory
 import javax.inject.Inject
