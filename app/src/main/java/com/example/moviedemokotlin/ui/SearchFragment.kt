@@ -71,7 +71,6 @@ class SearchFragment: Fragment(), OnItemClick, Injectable {
         recyclerView.adapter = moviesAdapter
         moviesAdapter.setOnItemClick(this)
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
-        swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = true }
         swipeRefreshLayout.setOnRefreshListener {
             moviesAdapter.resetData()
             moviesViewModel.resetSearchMovies()
@@ -91,7 +90,11 @@ class SearchFragment: Fragment(), OnItemClick, Injectable {
                         && !isLoading && !isRefreshing){
                     if(!isPullUp){
                         isPullUp = true
-                        moviesAdapter.changeLoadState(MoviesAdapter.PULL_UP_TO_LOAD)
+                        if (page == total_pages){
+                            moviesAdapter.changeLoadState(MoviesAdapter.NO_MORE)
+                        }else {
+                            moviesAdapter.changeLoadState(MoviesAdapter.PULL_UP_TO_LOAD)
+                        }
                     }else {
                         isPullUp = false
                         if (page < total_pages){
@@ -110,26 +113,29 @@ class SearchFragment: Fragment(), OnItemClick, Injectable {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = true }
         moviesViewModel = ViewModelProviders.of(this,factory).get(MoviesViewModel::class.java)
         moviesViewModel.getSearchMoviesLivedata().observe(viewLifecycleOwner
                 , Observer<ApiResponse> { t ->
             run{
                 if(t?.moviesResponse != null) {
-                    swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = false }
                     movies = t.moviesResponse.results
                     page = t.moviesResponse.page
                     total_pages = t.moviesResponse.total_pages
                     moviesAdapter.setMoviesList(t.moviesResponse.results)
 //                    moviesAdapter.addMovies(t.moviesResponse.results)
-                    moviesAdapter.changeLoadState(MoviesAdapter.PULL_UP_TO_LOAD)
-                    isLoading = false
                 }
                 else if(t?.errorMessage != null){
-                    swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = false }
-                    moviesAdapter.changeLoadState(MoviesAdapter.PULL_UP_TO_LOAD)
-                    isLoading = false
                     Toast.makeText(context,"fail", Toast.LENGTH_SHORT).show()
                 }
+                if (page == total_pages) {
+                    moviesAdapter.changeLoadState(MoviesAdapter.NO_MORE)
+                }else {
+                    moviesAdapter.changeLoadState(MoviesAdapter.PULL_UP_TO_LOAD)
+                }
+                isLoading = false
+                if (swipeRefreshLayout.isRefreshing)
+                    swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = false }
             }
         })
         moviesViewModel.resetSearchMovies()
